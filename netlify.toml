@@ -1,0 +1,15 @@
+cd C:\Users\Lenovo\Projects\Fileflow\fileflow
+@'
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+'@ | Set-Content -Path .\netlify.toml -Encoding utf8
