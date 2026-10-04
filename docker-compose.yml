@@ -1,0 +1,125 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: fileflow-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: fileflow
+      MYSQL_USER: fileflow
+      MYSQL_PASSWORD: fileflow
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pfileflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: fileflow-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # MinIO server — Chainguard image, distroless (no shell, no mc inside)
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    container_name: fileflow-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  # Waits until MinIO is actually ready to accept requests
+  minio-ready:
+    image: cgr.dev/chainguard/minio-client:latest
+    container_name: fileflow-minio-ready
+    depends_on:
+      - minio
+    environment:
+      MC_HOST_local: http://minioadmin:minioadmin@minio:9000
+    command: ready local
+    restart: "no"
+
+  # Creates the bucket once MinIO is ready
+  minio-init:
+    image: cgr.dev/chainguard/minio-client:latest
+    container_name: fileflow-minio-init
+    depends_on:
+      minio-ready:
+        condition: service_completed_successfully
+    environment:
+      MC_HOST_local: http://minioadmin:minioadmin@minio:9000
+    command: mb --ignore-existing local/fileflow
+    restart: "no"
+
+  backend:
+    build:
+      context: ./backend
+    container_name: fileflow-backend
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  worker:
+    build:
+      context: ./backend
+    container_name: fileflow-worker
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./backend:/app
+    command: celery -A app.celery_app.celery_app worker --loglevel=info --concurrency=2
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: fileflow-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  mysql_data:
+  minio_data:
