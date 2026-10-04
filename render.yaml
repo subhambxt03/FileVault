@@ -1,0 +1,59 @@
+services:
+  # Web Service (FastAPI)
+  - type: web
+    name: fileflow-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: BACKEND_CORS_ORIGINS
+        sync: false # Set after Netlify is deployed
+      - key: DATABASE_URL
+        sync: false # Your TiDB URL
+      - key: DB_SSL_CA
+        sync: false # Path to CA cert in container
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: fileflow-redis
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: fileflow-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: fileflow-redis
+          property: connectionString
+      - key: S3_ENDPOINT_URL
+        sync: false # Cloudflare R2 endpoint
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_BUCKET
+        value: fileflow
+      - key: S3_REGION
+        value: auto
+      - key: S3_FORCE_PATH_STYLE
+        value: "true"
+      - key: S3_SIGNED_URL_EXPIRE_SECONDS
+        value: "3600"
+      - key: MAX_UPLOAD_SIZE_MB
+        value: "10"
+
+  # Redis (for Celery broker/backend)
+  - type: redis
+    name: fileflow-redis
+    plan: free
+    ipAllowList: [] # Only internal access
