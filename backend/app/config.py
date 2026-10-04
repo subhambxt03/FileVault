@@ -16,19 +16,23 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:5173"
     OAUTH_REDIRECT_BASE: str = "http://localhost:8000/integrations"
 
-    DATABASE_URL: str = "mysql+pymysql://3Hqho17Khbk7k3s.root:Ed3UZRlAvxg9rYIn@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/test"
+    DATABASE_URL: str = (
+        "mysql+pymysql://3Hqho17Khbk7k3s.root:"
+        "Ed3UZRlAvxg9rYIn@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/fileflow"
+    )
     DB_SSL_CA: str = ""
+
     REDIS_URL: str = "redis://localhost:6379/0"
     CELERY_BROKER_URL: str = "redis://localhost:6379/0"
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/1"
 
-    S3_ENDPOINT_URL: str = "http://localhost:9000"
-    S3_REGION: str = "us-east-1"
-    S3_ACCESS_KEY_ID: str = "minioadmin"
-    S3_SECRET_ACCESS_KEY: str = "minioadmin"
+    # ---------- Upstash Blob ----------
+    # One token replaces endpoint + access key + secret. Get it from
+    # Upstash Console -> your bucket -> Connect.
+    UPSTASH_BLOB_TOKEN: str = ""
     S3_BUCKET: str = "fileflow"
-    S3_FORCE_PATH_STYLE: bool = True
-    S3_SIGNED_URL_EXPIRE_SECONDS: int = 3600
+    # Upstash signed URLs are capped at 10 minutes; keep this <= 600.
+    S3_SIGNED_URL_EXPIRE_SECONDS: int = 300
 
     MAX_UPLOAD_SIZE_MB: int = 10
     MAX_AVATAR_SIZE_MB: int = 2
