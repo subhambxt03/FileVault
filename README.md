@@ -140,31 +140,45 @@ Create an R2 API token with Object Read & Write for that bucket
 
 Set the S3 env vars in Render
 
-🔮 Future Improvements
-□ 🔌 Introduce a durable queue (Celery + Redis) for job persistence across restarts
-□ ⚡ Real-time job updates via WebSockets instead of polling
-□ 📦 Chunked / resumable uploads for large files
-□ 🖼️ Preview thumbnails for PDFs
-□ 📂 Batch upload
-□ 🛠️ Admin dashboard for queue depth and worker health
-□ 🔑 Password reset flow
-□ ✉️ Email verification
-□ 🚦 Rate limiting per IP and per user
-👨‍💻 Author
-Shubham Bisht
-Web Developer & Designer
 
-https://img.shields.io/badge/GitHub-subhambxt03-181717?logo=github&logoColor=white
+## 🔮 Future Improvements
 
-https://img.shields.io/badge/Portfolio-GX%20Shubham-FFAE24
+- [ ] 🔌 Introduce a durable queue (Celery + Redis) for job persistence across restarts
+- [ ] ⚡ Real-time job updates via WebSockets instead of polling
+- [ ] 📦 Chunked / resumable uploads for large files
+- [ ] 🖼️ Preview thumbnails for PDFs
+- [ ] 📂 Batch upload
+- [ ] 🛠️ Admin dashboard for queue depth and worker health
+- [ ] 🔑 Password reset flow
+- [ ] ✉️ Email verification
+- [ ] 🚦 Rate limiting per IP and per user
 
-📄 License
-This project is licensed under the MIT License.
+---
+
+## 👨‍💻 Author
+
+### Shubham Bisht
+
+**Web Developer & Designer**
+
+[![GitHub](https://img.shields.io/badge/GitHub-subhambxt03-181717?logo=github&logoColor=white)](https://github.com/subhambxt03)
+
+[![Portfolio](https://img.shields.io/badge/Portfolio-GX%20Shubham-FFAE24)](https://shubhamm-dev.netlify.app/)
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
 
 You are free to use, modify, and distribute this project according to the terms of the license.
 
-<div align="center">
-⭐ Star this repository if you enjoyed the project!
-Made with ❤️ and 🗂️ by Shubham
+---
 
-</div> 
+<div align="center">
+
+### ⭐ Star this repository if you enjoyed the project!
+
+**Made with ❤️ and 🗂️ by Shubham**
+
+</div>
