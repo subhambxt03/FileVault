@@ -35,8 +35,8 @@ class Settings(BaseSettings):
     CELERY_RESULT_BACKEND: str = "redis://red-db17uk9srm7s73agc1m0:6379/1"
 
     # ---------- S3-compatible storage ----------
-    UPSTASH_BLOB_TOKEN=your_new_token
-    S3_BUCKET=filevault
+    UPSTASH_BLOB_TOKEN=""
+    S3_BUCKET="filevault"
     S3_SIGNED_URL_EXPIRE_SECONDS=300
 
     MAX_UPLOAD_SIZE_MB: int = 10
