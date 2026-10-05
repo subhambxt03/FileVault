@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext.jsx";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 function resolveAvatar(url) {
   if (!url) return null;

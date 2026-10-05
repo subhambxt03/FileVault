@@ -11,7 +11,7 @@ import { getJob, getDownload } from "../services/jobs";
 import { api, extractError } from "../api/client";
 import Toast from "../components/Toast.jsx";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const STEPS = ["Queued", "Processing", "Completed"];
 

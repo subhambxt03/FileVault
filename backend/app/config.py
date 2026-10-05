@@ -22,6 +22,7 @@ class Settings(BaseSettings):
 
     FRONTEND_URL: str = "https://fileevaultt.netlify.app"
 
+
     OAUTH_REDIRECT_BASE: str = (
         "https://filevault-n9at.onrender.com/integrations"
     )
