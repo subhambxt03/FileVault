@@ -5,50 +5,65 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore"
+    )
 
-    APP_ENV: str = "development"
+    APP_ENV: str = "production"
+
     SECRET_KEY: str = "change-me"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
     ALGORITHM: str = "HS256"
 
-    BACKEND_CORS_ORIGINS: str = "https://fileevaultt.netlify.app,http://localhost:5173"
-    FRONTEND_URL: str = "http://localhost:5173"
-    OAUTH_REDIRECT_BASE: str = "http://localhost:8000/integrations"
-
-    DATABASE_URL: str = (
-        "mysql+pymysql://3Hqho17Khbk7k3s.root:"
-        "Ed3UZRlAvxg9rYIn@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/fileflow"
+    BACKEND_CORS_ORIGINS: str = (
+        "https://fileevaultt.netlify.app,http://localhost:5173"
     )
+
+    FRONTEND_URL: str = "https://fileevaultt.netlify.app"
+
+    OAUTH_REDIRECT_BASE: str = (
+        "https://filevault-n9at.onrender.com/integrations"
+    )
+
+    DATABASE_URL: str = ""
+
     DB_SSL_CA: str = ""
 
-    REDIS_URL: str = "redis://localhost:6379/0"
-    CELERY_BROKER_URL: str = "redis://localhost:6379/0"
-    CELERY_RESULT_BACKEND: str = "redis://localhost:6379/1"
+    REDIS_URL: str = "redis://red-db17uk9srm7s73agc1m0:6379"
+    CELERY_BROKER_URL: str = "redis://red-db17uk9srm7s73agc1m0:6379"
+    CELERY_RESULT_BACKEND: str = "redis://red-db17uk9srm7s73agc1m0:6379/1"
 
-    # ---------- Upstash Blob ----------
-    # One token replaces endpoint + access key + secret. Get it from
-    # Upstash Console -> your bucket -> Connect.
-    UPSTASH_BLOB_TOKEN: str = ""
+    # ---------- S3-compatible storage ----------
+    S3_ENDPOINT_URL: str = ""
+    S3_ACCESS_KEY_ID: str = ""
+    S3_SECRET_ACCESS_KEY: str = ""
     S3_BUCKET: str = "filevault"
+    S3_REGION: str = "auto"
     S3_SIGNED_URL_EXPIRE_SECONDS: int = 300
 
     MAX_UPLOAD_SIZE_MB: int = 10
     MAX_AVATAR_SIZE_MB: int = 2
 
-    # OAuth providers (empty = not configured)
     GITHUB_CLIENT_ID: str = ""
     GITHUB_CLIENT_SECRET: str = ""
+
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
+
     SLACK_CLIENT_ID: str = ""
     SLACK_CLIENT_SECRET: str = ""
+
     DROPBOX_CLIENT_ID: str = ""
     DROPBOX_CLIENT_SECRET: str = ""
 
     @property
     def cors_origins(self) -> List[str]:
-        return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
+        return [
+            o.strip()
+            for o in self.BACKEND_CORS_ORIGINS.split(",")
+            if o.strip()
+        ]
 
     @property
     def max_upload_size_bytes(self) -> int:
@@ -61,7 +76,6 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    
     return Settings()
 
 
