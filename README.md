@@ -2,7 +2,6 @@
 
 # 📁 FileVault
 
-**Upload once. Process in the background. Get results when they're ready. ⚡**
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?logo=vite&logoColor=white)
@@ -101,120 +100,45 @@ premium responsive frontend.
 
 ---
 
-## 🏗️ Architecture
-┌──────────────────┐
-│ React frontend │ Netlify
-│ (Vite + TW) │
-└────────┬─────────┘
-│ HTTPS / JWT
-▼
-┌──────────────────────────────────┐
-│ FastAPI backend │ Render
-│ (uvicorn) │
-│ │
-│ ┌────────────────────────────┐ │
-│ │ Background thread │ │
-│ │ (per upload) │ │
-│ │ → retries + backoff │ │
-│ │ → processing │ │
-│ │ → webhook on finish │ │
-│ └──────────┬─────────────────┘ │
-└─────────────┼────────────────────┘
-│
-▼
-┌───────────────┐
-│ MySQL (TiDB) │
-└───────────────┘
-▲
-│
-┌───────────────┐
-│ Object storage│
-│ (R2 / S3) │
-└───────────────┘
-
-text
-
-When a user uploads a file, the API returns a job ID instantly, then spawns a
-daemon thread that handles the processing off the request path. Retries, status
-updates, and webhook delivery all happen inside that thread.
-
----
-
-🔄 How It Works
-Upload Flow
-POST /files/upload receives the multipart file
-
-Backend validates MIME type, extension, and size
-
-A jobs row is created with status QUEUED
-
-Original file is uploaded to S3-compatible storage
-
-A daemon thread is spawned to process the job
-
-API returns the job ID and status immediately
-
-The thread sets status to PROCESSING
-
-It downloads the file, processes it, uploads outputs to storage
-
-Status becomes DONE (or FAILED after 3 retries)
-
-A notification is created; a webhook fires if configured
-
-Frontend polls /jobs/{id}/status every 3 seconds until finished
 
 
+## 🚀 Deployment
 
-🚀 Deployment
-Frontend — Netlify
-Connect the GitHub repo
+### Frontend — Netlify
 
-netlify.toml sets base directory to frontend
+1. Connect the GitHub repo
+2. `netlify.toml` sets base directory to `frontend`
+3. Add environment variable:
+   - `VITE_API_BASE_URL=https://<your-render-service>.onrender.com`
+4. Deploy
 
-Add environment variable:
+### Backend — Render
 
-VITE_API_BASE_URL=https://<your-render-service>.onrender.com
+1. Connect the GitHub repo
+2. Render reads `render.yaml` to provision the web service
+3. Set the following env vars in the dashboard:
+   - `DATABASE_URL` (TiDB or any MySQL 8)
+   - `DB_SSL_CA` (e.g. `/app/certs/isrgrootx1.pem`)
+   - `S3_ENDPOINT_URL`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`
+   - `BACKEND_CORS_ORIGINS` (your Netlify URL)
+   - `SECRET_KEY` (long random value)
+4. Deploy
 
-Deploy
+### Database — TiDB Cloud (Free)
 
-Backend — Render
-Connect the GitHub repo
+1. Create a Serverless cluster at https://tidbcloud.com
+2. Copy the connection string and CA certificate
+3. Store the CA at `backend/certs/isrgrootx1.pem` and commit it
+4. Run migrations locally against the cluster:
 
-Render reads render.yaml to provision the web service
-
-Set the following env vars in the dashboard:
-
-DATABASE_URL (TiDB or any MySQL 8)
-
-DB_SSL_CA (e.g. /app/certs/isrgrootx1.pem)
-
-S3_ENDPOINT_URL, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY
-
-BACKEND_CORS_ORIGINS (your Netlify URL)
-
-SECRET_KEY (long random value)
-
-Deploy
-
-Database — TiDB Cloud (Free)
-Create a Serverless cluster at https://tidbcloud.com
-
-Copy the connection string and CA certificate
-
-Store the CA at backend/certs/isrgrootx1.pem and commit it
-
-Run migrations locally against the cluster:
-
-bash
-alembic upgrade head
+   ```bash
+   alembic upgrade head
 Object Storage — Cloudflare R2 (Free)
 Create a bucket named fileflow
 
 Create an R2 API token with Object Read & Write for that bucket
 
 Set the S3 env vars in Render
-
 
 🔮 Future Improvements
 □ 🔌 Introduce a durable queue (Celery + Redis) for job persistence across restarts
@@ -237,11 +161,10 @@ https://img.shields.io/badge/Portfolio-GX%20Shubham-FFAE24
 📄 License
 This project is licensed under the MIT License.
 
-You are free to use, modify, and distribute this project according to the terms
-of the license.
+You are free to use, modify, and distribute this project according to the terms of the license.
 
 <div align="center">
 ⭐ Star this repository if you enjoyed the project!
 Made with ❤️ and 🗂️ by Shubham
 
-</div> ```
+</div> 
