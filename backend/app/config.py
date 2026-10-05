@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
     ALGORITHM: str = "HS256"
 
-    BACKEND_CORS_ORIGINS: str = "http://localhost:5173"
+    BACKEND_CORS_ORIGINS: str = "https://fileevaultt.netlify.app,http://localhost:5173"
     FRONTEND_URL: str = "http://localhost:5173"
     OAUTH_REDIRECT_BASE: str = "http://localhost:8000/integrations"
 
