@@ -30,8 +30,7 @@ class Settings(BaseSettings):
     # One token replaces endpoint + access key + secret. Get it from
     # Upstash Console -> your bucket -> Connect.
     UPSTASH_BLOB_TOKEN: str = ""
-    S3_BUCKET: str = "fileflow"
-    # Upstash signed URLs are capped at 10 minutes; keep this <= 600.
+    S3_BUCKET: str = "filevault"
     S3_SIGNED_URL_EXPIRE_SECONDS: int = 300
 
     MAX_UPLOAD_SIZE_MB: int = 10
@@ -62,6 +61,7 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
+    
     return Settings()
 
 
