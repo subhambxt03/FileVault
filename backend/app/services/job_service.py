@@ -1,4 +1,5 @@
 import json
+import threading
 from datetime import datetime, timezone
 
 from sqlalchemy import func, select
@@ -35,9 +36,15 @@ def create_job(db: Session, *, user_id: int, filename: str, content_type: str,
     db.commit()
     db.refresh(job)
 
-    # Local import to avoid a circular dependency with app.tasks.processing
-    from app.tasks.processing import process_file_task
-    process_file_task.delay(job.id)
+    # Run processing in a background thread so the HTTP request returns immediately.
+    # Replaces the old Celery .delay() call.
+    from app.tasks.processing import process_file
+    threading.Thread(
+        target=process_file,
+        args=(job.id,),
+        daemon=True,
+    ).start()
+
     return job
 
 
